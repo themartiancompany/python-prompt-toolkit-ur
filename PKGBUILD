@@ -1,50 +1,118 @@
+# SPDX-License-Identifier: AGPL-3.0
+#
 # Maintainer: Danny Waser (Waser Technologies) <waser@waser.tech>
+# Maintainer:  Pellegrino Prevete <cGVsbGVncmlub3ByZXZldGVAZ21haWwuY29tCg== | base -d>
+# Maintainer:  Truocolo <truocolo@aol.com>
 
 export PIP_CONFIG_FILE=/dev/null
 export PIP_DISABLE_PIP_VERSION_CHECK=true
 
-pkgname=python-prompt-toolkit
+_py="python"
+_pkg="prompt-toolkit"
+pkgname="${_py}-${_pkg}"
 epoch=
 pkgver=3.0.32
 pkgrel=00
-pkgdesc='Library for building powerful interactive command lines in Python'
-arch=(any)
-url=https://github.com/prompt-toolkit/python-prompt-toolkit
-license=(BSD)
-depends=(python python-wcwidth)
-depends+=(python-typing_extensions python-pygments)
+_pkgdesc=(
+  'Library for building powerful'
+  'interactive command lines in Python'
+)
+pkgdesc="${_pkgdesc[*]}"
+arch=(
+  any
+)
+_ns="${_pkg}"
+_http="https://github.com+"
+url="${_http}/${_pkg}/${pkgname}"
+license=(
+  BSD
+)
+depends=(
+  "${_py}"
+  "${_py}-wcwidth"
+)
+depends+=(
+  "${_py}-typing_extensions"
+  "${_py}-pygments"
+)
 makedepends=()
 checkdepends=()
 provides=()
-conflicts=(${provides%=*})  # No quotes, to avoid an empty entry.
-source=(PKGBUILD_EXTRAS)
-md5sums=(SKIP)
+conflicts=(
+  ${provides%=*}
+)  # No quotes, to avoid an empty entry.
+source=(
+  PKGBUILD_EXTRAS
+)
+md5sums=(
+  SKIP
+)
 noextract=()
-source+=(https://files.pythonhosted.org/packages/03/22/784990e865d847384c28a05ff33ed09791251b320c212f957c62a11bd2ab/prompt_toolkit-3.0.32-py3-none-any.whl)
-md5sums+=(daf2502e95fa6e1f78820a918808a544)
-noextract+=(prompt_toolkit-3.0.32-py3-none-any.whl)
-source+=(LICENSE)
-md5sums+=(b2cde7da89f0c1f3e49bf968d00d554f)
+_pypi_='https://files.pythonhosted.org/packages'
+source+=(
+  "${_pypi}/03/22/784990e865d847384c28a05ff33ed09791251b320c212f957c62a11bd2ab/prompt_toolkit-3.0.32-py3-none-any.whl"
+)
+md5sums+=(
+  daf2502e95fa6e1f78820a918808a544
+)
+noextract+=(
+  prompt_toolkit-3.0.32-py3-none-any.whl
+)
+source+=(
+  LICENSE
+)
+md5sums+=(
+  b2cde7da89f0c1f3e49bf968d00d554f
+)
 
 _first_source() {
-    echo " ${source_i686[@]} ${source_x86_64[@]} ${source[@]}" |
-        tr ' ' '\n' | grep -Pv '^(PKGBUILD_EXTRAS)?$' | head -1
+  echo \
+    " ${source_i686[@]} ${source_x86_64[@]} ${source[@]}" |
+    tr \
+      ' ' \
+      '\n' | \
+      grep \
+        -Pv \
+	'^(PKGBUILD_EXTRAS)?$' | \
+	head \
+	  -1
 }
 
-_vcs="$(grep -Po '^[a-z]+(?=\+)' <<< "$(_first_source)")"
-if [[ "$_vcs" ]]; then
-    makedepends+=("$(pkgfile --quiet /usr/bin/$_vcs)")
-    provides+=("${pkgname%-$_vcs}")
-    conflicts+=("${pkgname%-$_vcs}")
+_vcs="$( \
+  grep \
+    -Po \
+    '^[a-z]+(?=\+)' <<< \
+    "$(_first_source)")"
+if [[ "${_vcs}" ]]; then
+  makedepends+=(
+    "$( \
+      pkgfile \
+        --quiet \
+        /usr/bin/${_vcs})"
+  )
+  provides+=(
+    "${pkgname%-$_vcs}"
+  )
+  conflicts+=(
+    "${pkgname%-$_vcs}"
+  )
 fi
 
 _is_wheel() {
-    [[ $(_first_source) =~ \.whl$ ]]
+  [[ $(_first_source) =~ \.whl$ ]]
 }
 
 if [[ _is_wheel &&
-      $(basename "$(_first_source)" | rev | cut -d- -f1 | rev) =~ ^manylinux ]]; then
-    options=(!strip)  # https://github.com/pypa/manylinux/issues/119
+  $( \
+    basename \
+      "$(_first_source)" | \
+      rev | \
+        cut -d- -f1 | \
+	  rev) =~ ^manylinux ]]; then
+  # https://github.com/pypa/manylinux/issues/119
+  options=(
+    !strip
+  )
 fi
 
 _dist_name() {
@@ -141,3 +209,5 @@ package() { _package; }
 makedepends=($(printf '%s\n' "${makedepends[@]}" |
                grep -Pwv "^($(IFS='|'; echo "${depends[*]}"))$"))
 :  # Apparently ending with makedepends assignment sometimes fails.
+
+# vim:set sw=2 sts=-1 et:
